@@ -5,8 +5,8 @@
  */
 
 
-import ContactApp.Contact;
-import ContactApp.ContactService;
+import org.example.models.Contact;
+import org.example.models.ContactService;
 
 import static org.junit.jupiter.api.Assertions.*;
 

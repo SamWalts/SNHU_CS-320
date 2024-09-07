@@ -5,7 +5,8 @@
  */
 
 
-import ContactApp.Contact;
+import org.example.models.Contact;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
