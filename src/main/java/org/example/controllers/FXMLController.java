@@ -1,4 +1,4 @@
-package org.example;
+package org.example.controllers;
 /*
 Put header here
 

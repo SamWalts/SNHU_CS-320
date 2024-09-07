@@ -3,7 +3,7 @@
  *
  * @author Samuel Walters
  */
-
+package org.example;
 
 import org.example.models.Contact;
 import org.example.models.ContactService;
@@ -15,13 +15,12 @@ import org.junit.jupiter.api.Test;
 
 
 public class ContactServiceTest {
-    private Contact testContact;
     private ContactService testContactService;
 
     @BeforeEach
     public void setupTests() {
         testContactService = new ContactService();
-        testContact = new Contact("000", "Jim", "Beam", "1234567890", "123 2nd Street, Jamaica");
+        Contact testContact = new Contact("000", "Jim", "Beam", "1234567890", "123 2nd Street, Jamaica");
         testContactService.addContact(testContact);
     }
 

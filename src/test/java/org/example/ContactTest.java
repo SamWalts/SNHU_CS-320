@@ -3,6 +3,7 @@
  *
  * @author Samuel Walters
  */
+package org.example;
 
 
 import org.example.models.Contact;
