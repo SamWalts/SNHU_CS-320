@@ -5,8 +5,6 @@
  */
 
 
-package test;
-
 import ContactApp.Contact;
 import static org.junit.jupiter.api.Assertions.*;
 
