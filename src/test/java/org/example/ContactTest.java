@@ -3,11 +3,11 @@
  *
  * @author Samuel Walters
  */
+package org.example;
 
 
-package test;
+import org.example.models.Contact;
 
-import ContactApp.Contact;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
