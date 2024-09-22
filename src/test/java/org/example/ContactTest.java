@@ -24,12 +24,14 @@ class ContactTest {
         @Test
         void firstNameTest() {
                 Contact contact = new Contact("1234", "Sam", "Walters", "4322344322", "emailstuff");
+                contact.setFirstName("Jimmy");
+                assertEquals("Jimmy", contact.getFirstName());
                 assertNotNull(contact.getFirstName());
                 assertThrows(IllegalArgumentException.class, () -> {
                         contact.setFirstName("");
                 });
             assertThrows(IllegalArgumentException.class, () -> {
-                contact.setFirstName("12345678900");
+                contact.setFirstName("1234567892161651516516516156165165100");
             });
         }
 
@@ -40,7 +42,7 @@ class ContactTest {
                contact.setLastName("");
            });
            assertThrows(IllegalArgumentException.class, () -> {
-               contact.setLastName("2342345234234234234234234234234234234");
+               contact.setLastName("2342345234234234234234234122345678912345678912345678912345678934234234234");
            });
         }
 
@@ -56,6 +58,13 @@ class ContactTest {
             assertThrows(IllegalArgumentException.class, () -> {
                 contact.setPhone("1");
             });
+        }
+
+        @Test
+        void phoneInputTest() {
+            Contact contact = new Contact("123", "`Sam", "Walters", "4322344322", "emailstuff");
+            contact.setPhone("(555)555-5555");
+            assertEquals("5555555555", contact.getPhone());
         }
 
         @Test

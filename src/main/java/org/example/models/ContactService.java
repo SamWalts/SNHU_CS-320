@@ -6,6 +6,9 @@
 
 package org.example.models;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.util.Map;
 import java.util.HashMap;
 
@@ -14,6 +17,11 @@ public class ContactService {
 
     public ContactService() {
         contactMap = new HashMap<>();
+    }
+
+    // TODO: Can remove when DB implemented and use phoneNumber as PK.
+    public String generateId() {
+        return Integer.toString(contactMap.size() + 1);
     }
 
     public void addContact(Contact contact) {
@@ -43,6 +51,7 @@ public class ContactService {
         }
         return contactMap.get(contactId);
     }
+
     public void updateContactMap(String contactId, String updateField, String updateValue) {
         if (contactId == null || contactId.isEmpty()) {
             throw new IllegalArgumentException("Must have non empty non null contact ID.");
@@ -68,5 +77,20 @@ public class ContactService {
             default:
                 throw new IllegalArgumentException("Updatable field names are: firstname, lastname, phone, and address.");
         }
+    }
+
+/*  Retrieve contacts from the map. This will get replaced with the DB.
+    @return ObservableList<Contact>
+*/
+    public ObservableList<Contact> getContactsList() {
+        ObservableList<Contact> contactList = FXCollections.observableArrayList();
+        try{
+            for (Map.Entry<String, Contact> entry : contactMap.entrySet()) {
+                contactList.add(entry.getValue());
+            }
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+        return contactList;
     }
 }
