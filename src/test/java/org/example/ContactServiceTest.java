@@ -46,7 +46,7 @@ public class ContactServiceTest {
     @Test
     public void deleteNonExistentContact() {
         assertThrows(IllegalArgumentException.class, () -> {
-            testContactService.deleteContact("80085");
+            testContactService.deleteContact("80088");
         });
     }
 
@@ -54,9 +54,9 @@ public class ContactServiceTest {
     public void updateFirstNameTest() {
         testContactService.updateContactMap("000", "firstname", "Success");
         assertEquals("Success", testContactService.getContact("000").getFirstName());
-        //Should not update this name, as it breaks the requirement of 10 chars only
+        //Should not update this name, as it breaks the requirement of 20 chars only
         assertThrows(IllegalArgumentException.class, () -> {
-            testContactService.updateContactMap("000", "firstname", "1234567890000");
+            testContactService.updateContactMap("000", "firstname", "12345678900asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf00");
         });
     }
 
@@ -64,9 +64,9 @@ public class ContactServiceTest {
     public void updateLastNameTest() {
         testContactService.updateContactMap("000", "lastname", "Success");
         assertEquals("Success", testContactService.getContact("000").getLastName());
-        //Should not update this name, as it breaks the requirement of 10 chars only
+        //Should not update this name, as it breaks the requirement of 30 chars only
         assertThrows(IllegalArgumentException.class, () -> {
-            testContactService.updateContactMap("000", "lastname", "1234567890000");
+            testContactService.updateContactMap("000", "lastname", "1234561awdfasdfasdfadsfasdfadsfadsf231231231231231231231231231237890000");
         });
     }
 
@@ -80,6 +80,7 @@ public class ContactServiceTest {
         });
     }
 
+    @Test
     public void updatePhoneNumberTest() {
         testContactService.updateContactMap("000", "phone", "1111111111");
         assertEquals("1111111111", testContactService.getContact("000").getPhone());
