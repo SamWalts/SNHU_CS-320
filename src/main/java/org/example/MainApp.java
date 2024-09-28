@@ -1,3 +1,8 @@
+/*
+Artifact Enhancement
+Author: Samuel Walters
+Date: 9/26/24
+ */
 package org.example;
 
 import javafx.application.Application;

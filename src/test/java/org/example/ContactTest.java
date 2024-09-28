@@ -1,7 +1,10 @@
 /**
- * Contact Testing class
+ * Original Artifact
+ * Contact Object Testing class
  *
  * @author Samuel Walters
+ *
+ * Last update 9/26/24
  */
 package org.example;
 
@@ -21,6 +24,7 @@ class ContactTest {
                 assertEquals("123", contact.getId());
         }
 
+//        9/26 Updated the test to increase the amount of characters in the first name.
         @Test
         void firstNameTest() {
                 Contact contact = new Contact("1234", "Sam", "Walters", "4322344322", "emailstuff");
@@ -35,6 +39,7 @@ class ContactTest {
             });
         }
 
+//      9/26 Updated the test to increase the amount of characters in the last name.
         @Test
         void lastNameTest() {
            Contact contact = new Contact("1234", "Sam", "Walters", "4322344322", "emailstuff");
@@ -60,6 +65,7 @@ class ContactTest {
             });
         }
 
+//      9/26 Added this test to specifically check that the contact.setPhone removes all but the numbers.
         @Test
         void phoneInputTest() {
             Contact contact = new Contact("123", "`Sam", "Walters", "4322344322", "emailstuff");

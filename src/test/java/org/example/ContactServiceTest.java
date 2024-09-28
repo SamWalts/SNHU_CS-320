@@ -1,7 +1,10 @@
 /**
+ * Original Artifact
  * Contact Service testing class
  *
  * @author Samuel Walters
+ *
+ * Last update 9/26/24
  */
 package org.example;
 
@@ -42,7 +45,7 @@ public class ContactServiceTest {
         // Cannot get a Contact that no longer exists.
         assertNull(testContactService.getContact("000"));
     }
-
+//    9/26 Updated the contact ID.
     @Test
     public void deleteNonExistentContact() {
         assertThrows(IllegalArgumentException.class, () -> {
@@ -50,6 +53,7 @@ public class ContactServiceTest {
         });
     }
 
+//    9/26 Changed the test to increase the amount of characters in the name.
     @Test
     public void updateFirstNameTest() {
         testContactService.updateContactMap("000", "firstname", "Success");
@@ -60,6 +64,7 @@ public class ContactServiceTest {
         });
     }
 
+//    9/26 Changed the test to increase the amount of characters in the name.
     @Test
     public void updateLastNameTest() {
         testContactService.updateContactMap("000", "lastname", "Success");
@@ -70,11 +75,11 @@ public class ContactServiceTest {
         });
     }
 
+//   9/26  Changed the test to increase the amount of characters in the address.
     @Test
     public void updateAddressTest() {
         testContactService.updateContactMap("000", "address", "Success");
         assertEquals("Success", testContactService.getContact("000").getAddress());
-        //Should not update this name, as it breaks the requirement of 10 chars only
         assertThrows(IllegalArgumentException.class, () -> {
             testContactService.updateContactMap("000", "address", "1234567444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444890000");
         });

@@ -1,3 +1,7 @@
+<!--        Artifact Enhancement-->
+<!--        Author: Samuel Walters-->
+<!--        Date: 9/26/24-->
+<!--        Description: This is the primary fxml file for the application. It contains the layout for the main window.-->
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>

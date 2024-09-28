@@ -4,8 +4,10 @@ Date: Dec 20, 2011
 Purpose: CSS options for JavaFX
 http://fxexperience.com/2011/12/styling-fx-buttons-with-css/
 
+This file is a copy of the original CSS file that comes with the JavaFX template.
+Artifact prepackaged with the JavaFX template.
+Artifact will be completely overhauled for the final submission.
 */
-
 
 .round-red {
     -fx-background-color: linear-gradient(#ff5400, #be1d00);

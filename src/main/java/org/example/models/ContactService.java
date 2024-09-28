@@ -1,7 +1,10 @@
 /**
+ * Original Artifact
  * Contact Service class
  *
  * @author Samuel Walters
+ *
+ *  Last update 9/26/24
  */
 
 package org.example.models;
@@ -20,6 +23,7 @@ public class ContactService {
     }
 
     // TODO: Can remove when DB implemented and use phoneNumber as PK.
+//  9/26 Created the generateId method to generate a unique ID for each contact.
     public String generateId() {
         return Integer.toString(contactMap.size() + 1);
     }
@@ -79,7 +83,8 @@ public class ContactService {
         }
     }
 
-/*  Retrieve contacts from the map. This will get replaced with the DB.
+/* 9/26 added to support observable list from JavaFX controller.
+    Retrieve contacts from the hashmap implementation. This will get replaced with the DB.
     @return ObservableList<Contact>
 */
     public ObservableList<Contact> getContactsList() {

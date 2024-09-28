@@ -1,9 +1,10 @@
-package org.example.controllers;
 /*
-Put header here
-
-
+Artifact Enhancement
+Author: Samuel Walters
+Date: 9/26/24
  */
+package org.example.controllers;
+
 
 import java.net.URL;
 import java.util.ResourceBundle;
