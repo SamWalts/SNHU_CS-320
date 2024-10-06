@@ -1,10 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!--        Artifact Enhancement-->
 <!--        Author: Samuel Walters-->
 <!--        Date: 9/26/24-->
 <!--        Description: This is the primary fxml file for the application. It contains the layout for the main window.-->
-<?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -13,7 +16,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.MainController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.MainController">
    <children>
       <HBox maxHeight="100.0" VBox.vgrow="ALWAYS" />
       <HBox VBox.vgrow="ALWAYS">
@@ -35,15 +38,24 @@
                                     <TextField id="phone" fx:id="phoneField" promptText="7155555555" />
                                     <Label text="Address" />
                                     <TextField id="address" fx:id="addressField" prefHeight="26.0" prefWidth="1946.0" promptText="Number and Street Name" />
-                                    <Button fx:id="createBtn" mnemonicParsing="false" onAction="#handleCreateButtonClick" text="Create" />
                                     <Label fx:id="labelMessage" prefHeight="18.0" prefWidth="299.0" />
+                                    <ButtonBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="61.0" prefWidth="1053.0" translateX="1.0">
+                                      <buttons>
+                                          <Button fx:id="deleteBtn" mnemonicParsing="false" onAction="#handleButtonClick" text="Delete" />
+                                        <Button fx:id="updateBtn" mnemonicParsing="false" onAction="#handleButtonClick" text="Update" />
+                                          <Button fx:id="createBtn" mnemonicParsing="false" onAction="#handleButtonClick" text="Create" />
+                                      </buttons>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </ButtonBar>
                                  </children>
                               </VBox>
                            </children>
                         </HBox>
                         <HBox layoutX="2.0" layoutY="467.0">
                            <children>
-                              <TableView fx:id="tableView" prefHeight="274.0" prefWidth="1054.0">
+                              <TableView fx:id="tableView" onMouseClicked="#mouseClicked" prefHeight="274.0" prefWidth="1054.0">
                                 <columns>
                                   <TableColumn fx:id="colFirstName" prefWidth="68.79999083280563" text="Last Name" />
                                   <TableColumn fx:id="colLastName" prefWidth="304.800048828125" text="First Name" />

@@ -2,6 +2,7 @@
 Artifact Enhancement
 Author: Samuel Walters
 Date: 9/26/24
+Updated: 10/2/24
  */
 package org.example;
 
@@ -10,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.example.data.DBConnection;
 
 import java.io.IOException;
 
@@ -21,6 +23,9 @@ public class MainApp extends Application {
     public void start(@SuppressWarnings("exports") Stage s) throws IOException {
         stage=s;
         setRoot("primary","Contact Application");
+//        10/2/24 added the below line to create the database connection on program start.
+        DBConnection db = new DBConnection();
+        db.getDBConnection();
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -39,9 +44,11 @@ public class MainApp extends Application {
         return fxmlLoader.load();
     }
 
-
+/*
+    Main method is used in JavaFX applications to launch the application.
+    Do not add anything to this method.
+ */
     public static void main(String[] args) {
         launch(args);
     }
-
 }

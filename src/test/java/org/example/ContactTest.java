@@ -4,7 +4,8 @@
  *
  * @author Samuel Walters
  *
- * Last update 9/26/24
+ * Last update 10/6/2024
+ * This class tests the Contact object. It does not test the database connection.
  */
 package org.example;
 
@@ -19,15 +20,14 @@ class ContactTest {
 
        @Test
         void idTest() {
-                Contact contact = new Contact("123", "Samuel", "Walters", "4322344322", "emailstuff");
-                assertNotNull(contact.getId());
-                assertEquals("123", contact.getId());
+                Contact contact = new Contact(1234, "Samuel", "Walters", "4322344322", "emailstuff");
+                assertEquals(1234, contact.getId());
         }
 
 //        9/26 Updated the test to increase the amount of characters in the first name.
         @Test
         void firstNameTest() {
-                Contact contact = new Contact("1234", "Sam", "Walters", "4322344322", "emailstuff");
+                Contact contact = new Contact(1234, "Sam", "Walters", "4322344322", "emailstuff");
                 contact.setFirstName("Jimmy");
                 assertEquals("Jimmy", contact.getFirstName());
                 assertNotNull(contact.getFirstName());
@@ -42,7 +42,7 @@ class ContactTest {
 //      9/26 Updated the test to increase the amount of characters in the last name.
         @Test
         void lastNameTest() {
-           Contact contact = new Contact("1234", "Sam", "Walters", "4322344322", "emailstuff");
+           Contact contact = new Contact(123, "Sam", "Walters", "4322344322", "emailstuff");
            assertThrows(IllegalArgumentException.class, () -> {
                contact.setLastName("");
            });
@@ -53,7 +53,7 @@ class ContactTest {
 
         @Test
         void phoneTest() {
-            Contact contact = new Contact("1234", "Sam", "Walters", "4322344322", "emailstuff");
+            Contact contact = new Contact(123, "Sam", "Walters", "4322344322", "emailstuff");
             assertThrows(IllegalArgumentException.class, () -> {
                 contact.setPhone("");
             });
@@ -68,14 +68,14 @@ class ContactTest {
 //      9/26 Added this test to specifically check that the contact.setPhone removes all but the numbers.
         @Test
         void phoneInputTest() {
-            Contact contact = new Contact("123", "`Sam", "Walters", "4322344322", "emailstuff");
+            Contact contact = new Contact(123, "`Sam", "Walters", "4322344322", "emailstuff");
             contact.setPhone("(555)555-5555");
             assertEquals("5555555555", contact.getPhone());
         }
 
         @Test
         void addressTest() {
-            Contact contact = new Contact("1234", "Sam", "Walters", "4322344322", "emailstuff");
+            Contact contact = new Contact(1234, "Sam", "Walters", "4322344322", "emailstuff");
             assertThrows(IllegalArgumentException.class, () -> {
                 contact.setAddress("");
             });
