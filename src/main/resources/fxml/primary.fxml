@@ -32,8 +32,14 @@
                                  <children>
                                     <Label alignment="TOP_CENTER" contentDisplay="CENTER" text="Add New Contact" />
                                     <Label text="Name" />
-                                    <TextField id="nameFirst" fx:id="nameFirst" promptText="First name" />
-                                    <TextField id="nmeLast" fx:id="nameLast" promptText="Last name" />
+                                    <TextField id="nameFirst" fx:id="nameFirst" promptText="First name">
+                                       <VBox.margin>
+                                          <Insets bottom="10.0" />
+                                       </VBox.margin></TextField>
+                                    <TextField id="nmeLast" fx:id="nameLast" promptText="Last name">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin></TextField>
                                     <Label text="Phone Number" />
                                     <TextField id="phone" fx:id="phoneField" promptText="7155555555" />
                                     <Label text="Address" />
@@ -57,10 +63,10 @@
                            <children>
                               <TableView fx:id="tableView" onMouseClicked="#mouseClicked" prefHeight="274.0" prefWidth="1054.0">
                                 <columns>
-                                  <TableColumn fx:id="colFirstName" prefWidth="68.79999083280563" text="Last Name" />
-                                  <TableColumn fx:id="colLastName" prefWidth="304.800048828125" text="First Name" />
-                                    <TableColumn fx:id="colPhoneNumber" prefWidth="403.9999694824219" text="Phone Number" />
-                                    <TableColumn fx:id="colAddress" prefWidth="272.800048828125" text="Address" />
+                                  <TableColumn fx:id="colFirstName" prefWidth="178.0" text="Last Name" />
+                                  <TableColumn fx:id="colLastName" prefWidth="373.0" text="First Name" />
+                                    <TableColumn fx:id="colPhoneNumber" prefWidth="219.0" text="Phone Number" />
+                                    <TableColumn fx:id="colAddress" prefWidth="281.0" text="Address" />
                                 </columns>
                               </TableView>
                            </children>

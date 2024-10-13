@@ -25,6 +25,7 @@ public class Contact {
         this.setPhone(phone);
         this.setAddress(address);
     }
+
 //    10/2 Created new constructor to allow for an ID to be passed in.
     public Contact(int Id, String firstName, String lastName, String phone, String address) {
         this.Id = Id;

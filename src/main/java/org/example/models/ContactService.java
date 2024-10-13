@@ -3,7 +3,8 @@
  * Contact Service class
  *
  * @author Samuel Walters
- *  Last update 10/6/2024
+ *  Last update 10/13/2024 To remove all hashmaps and update the class to use a database connection.
+ *
  */
 
 package org.example.models;
@@ -13,8 +14,6 @@ import javafx.collections.ObservableList;
 import org.example.data.DBConnection;
 
 import java.sql.*;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * 10/6/2024
@@ -23,10 +22,17 @@ import java.util.HashMap;
 public class ContactService {
     private DBConnection c;
 
+    /**
+     * Default constructor
+     */
     public ContactService() {
         this.c = new DBConnection();
     }
 
+    /**
+     * Constructor that takes in a DBConnection object.
+     * @param dbConnection
+     */
     public ContactService(DBConnection dbConnection) {
         this.c = dbConnection;
     }
@@ -96,6 +102,7 @@ public class ContactService {
     }
 
     /**
+     * @param contactId
      * @return contact
      * Takes in an integer contactId and returns the contact object from the database.
      */
@@ -119,6 +126,7 @@ public class ContactService {
         }
         return contact;
     }
+
 /**
     @param contact
     Takes in a contact object and updates the contact in the database.
@@ -139,7 +147,7 @@ public class ContactService {
         }
     }
 
-    /**
+    /*
      * @return contactList
      * 9/26 added to support observable list from JavaFX controller.
     *  10/6/2024 Get the list of contacts from the database and return it as an observable list.

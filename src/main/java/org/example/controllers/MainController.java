@@ -3,6 +3,7 @@ Artifact Enhancement
 Author: Samuel Walters
 Date: 9/26/24
 Updated: 10/4/24 to include the database connection and implement new buttons to update, and delete contacts.
+Issues: The program can be improved by adding a confirmation dialog before deleting a contact.
  */
 package org.example.controllers;
 
@@ -65,15 +66,13 @@ public class MainController implements Initializable {
 //   Call the ContactService class once to get the contacts list and use it throughout the program.
     ContactService contactService = new ContactService();
 
-//    private ObservableList<Contact> contactsList;
-
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         showContacts();
     }
 
-    /*
+    /**
+     * 10/4/2024
     * Method to show the contacts in the table view.
     * */
     @FXML
@@ -93,7 +92,6 @@ public class MainController implements Initializable {
      */
     @FXML
     private void handleButtonClick(ActionEvent e) {
-        System.out.println(((Button) e.getSource()).getId());
         switch(((Button) e.getSource()).getId()) {
             case "deleteBtn":
                 deleteContact();
@@ -142,6 +140,9 @@ public class MainController implements Initializable {
         try {
             labelMessage.setText("");
             Contact contact = tableView.getSelectionModel().getSelectedItem();
+            if (contact == null) {
+                labelMessage.setText("No contact selected.");
+            }
             contactService.deleteContact(contact);
             showContacts();
             clearFields();

@@ -1,10 +1,10 @@
 /**
- * Original Artifact
+ * Original Artifact-- ENHANCEMENT
  * Contact Service testing class
- *
- * Last update 10/6/2024
- * Mocking library Mockito is used to test the ContactService class.
- * This class mocks the database connection that is used in the ContactService class.
+ * Author: Samuel Walters
+ * Last update 10/13/2024
+ * Each test is designed to test a different method in the ContactService class.
+ * The tests are designed to test the CRUD operations of the ContactService class.
  */
 package org.example;
 
@@ -30,6 +30,7 @@ public class ContactServiceTest {
     /**
      * Testcontainers is used to create a docker container for the test database.
      * KEEP IN MIND: This will need to be updated inline with the production database.
+     * Uses standard login for test database that will be destroyed on test completion.
      */
     @Container
     public MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0.26")
@@ -41,8 +42,9 @@ public class ContactServiceTest {
     private ContactService testContactService;
 
     /**
+     * 10/13/2024
      * Setup the test environment in a docker environment.
-     * This is done to provide a clean database for each test.
+     * Each test will have a single contact in the database to begin with.
      * @throws Exception
      */
     @BeforeEach
@@ -59,7 +61,6 @@ public class ContactServiceTest {
         Contact testContact = new Contact("Jim", "Beam", "123-456-7890", "123 2nd Street, Jamaica State, 45555, United States");
         testContactService.addContact(testContact);
     }
-
 
     /**
      * Test to add a contact to the database
@@ -123,6 +124,10 @@ public class ContactServiceTest {
         }
     }
 
+    /**
+     * Test to update the last name of a contact
+     * @throws Exception
+     */
     @Test
     public void updateLastNameTest() throws Exception {
         testContactService.updateContact(new Contact(1, "Jim", "Success", "1234567890", "123 2nd Street, Jamaica State, 45555, United States"));
@@ -137,6 +142,10 @@ public class ContactServiceTest {
         }
     }
 
+    /**
+     * Test to update the address of a contact
+     * @throws Exception
+     */
     @Test
     public void updateAddressTest() throws Exception {
         testContactService.updateContact(new Contact(1, "Jim", "Beam", "1234567890", "Success"));
@@ -151,6 +160,10 @@ public class ContactServiceTest {
         }
     }
 
+    /**
+     * Test to update the phone number of a contact
+     * @throws Exception
+     */
     @Test
     public void updatePhoneNumberTest() throws Exception {
         testContactService.updateContact(new Contact(1, "Jim", "Beam", "1111111111", "123 2nd Street, Jamaica State, 45555, United States"));
