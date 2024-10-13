@@ -1,4 +1,4 @@
-/*
+/**
 Artifact Enhancement
 Author: Samuel Walters
 Date: 9/26/24
@@ -44,7 +44,7 @@ public class MainApp extends Application {
         return fxmlLoader.load();
     }
 
-/*
+/**
     Main method is used in JavaFX applications to launch the application.
     Do not add anything to this method.
  */

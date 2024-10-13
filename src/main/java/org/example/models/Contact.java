@@ -42,7 +42,7 @@ public class Contact {
         this.firstName = firstName;
     }
 
-/*
+/**
 * 9/26 Updated the phone number to allow for more than 10 digits.
 * Added a regex to remove any non-digit characters from the phone number.
 * */

@@ -1,4 +1,4 @@
-/*
+/**
 Artifact Enhancement
 Author: Samuel Walters
 Date: 9/26/24
@@ -86,7 +86,7 @@ public class MainController implements Initializable {
         tableView.setItems(contactsList);
     }
 
-    /*
+    /**
     @param e
     Updated 10/4/2024 takes in an action event and determines which button was clicked, then calls the appropriate method.
     All must end with a new call to showContacts() to update the table view.
@@ -111,7 +111,8 @@ public class MainController implements Initializable {
                 labelMessage.setText("Invalid button");
         }
     }
-    /*
+
+    /**
     * Method to create a contact. It will take the information from the text fields and create a new contact.
     * 10/4/2024 updated to use try/catch block to catch IllegalArgumentExceptions thrown by the Contact object.
      */
@@ -132,7 +133,7 @@ public class MainController implements Initializable {
         }
     }
 
-    /*
+    /**
     * Method to delete a contact. It will take the selected contact from the table view and delete it.
     * 10/4/2024
      */
@@ -149,7 +150,7 @@ public class MainController implements Initializable {
         }
     }
 
-    /*
+    /**
     * Method to handle a mouse click event. It will take the selected contact from the table view and populate the text fields.
     * 10/4/2024
      */
@@ -169,7 +170,7 @@ public class MainController implements Initializable {
         }
     }
 
-    /*
+    /**
     * Method to update a contact. It will take the selected contact from the table view and update it.
     * Updated 10/4/2024
     */
@@ -194,7 +195,8 @@ public class MainController implements Initializable {
         }
     }
 
-    /*
+    /**
+     * 9/26/2024
     * Method to clear the fields after a contact is created.
     * Called after every successful contact creation.
      */

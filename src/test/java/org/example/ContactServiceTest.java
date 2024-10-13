@@ -13,102 +13,155 @@ import org.example.models.Contact;
 import org.example.models.ContactService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
+@Testcontainers
 public class ContactServiceTest {
-    @Mock
-    private DBConnection mockDBConnection;
 
-    @Mock
-    private Connection mockConnection;
+    /**
+     * Testcontainers is used to create a docker container for the test database.
+     * KEEP IN MIND: This will need to be updated inline with the production database.
+     */
+    @Container
+    public MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0.26")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test");
 
-    @Mock
-    private PreparedStatement mockPreparedStatement;
-
-    @Mock
-    private ResultSet mockResultSet;
-
-    @InjectMocks
+    private DBConnection dbConnection;
     private ContactService testContactService;
 
+    /**
+     * Setup the test environment in a docker environment.
+     * This is done to provide a clean database for each test.
+     * @throws Exception
+     */
     @BeforeEach
     public void setupTests() throws Exception {
-        when(mockDBConnection.getDBConnection()).thenReturn(mockConnection);
-        when(mockConnection.prepareStatement(anyString(), anyInt())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getInt(1)).thenReturn(1);
+        dbConnection = new DBConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
+        testContactService = new ContactService(dbConnection);
 
-        Contact testContact = new Contact(1, "Jim", "Beam", "1234567890", "123 2nd Street, Jamaica State, 45555, United States");
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "CREATE TABLE IF NOT EXISTS contacts (contactId INT PRIMARY KEY AUTO_INCREMENT, firstname VARCHAR(45), lastname VARCHAR(45), phone VARCHAR(20), address VARCHAR(75))")) {
+            statement.execute();
+        }
+
+        Contact testContact = new Contact("Jim", "Beam", "123-456-7890", "123 2nd Street, Jamaica State, 45555, United States");
         testContactService.addContact(testContact);
     }
 
+
+    /**
+     * Test to add a contact to the database
+     * Adds with contactService, then checks test database for the added contact
+     * @throws Exception
+     */
     @Test
     public void addContactTest() throws Exception {
-        Contact newContact = new Contact(1, "John", "Lolligag", "1234567890", "Address stuff");
+        Contact newContact = new Contact(2, "John", "Lolligag", "1234567890", "Address stuff");
         testContactService.addContact(newContact);
 
-        verify(mockPreparedStatement, times(2)).executeUpdate();
-        assertNotNull(testContactService.getContact(1));
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
+            statement.setInt(1, 2);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                assertTrue(resultSet.next());
+                assertEquals("John", resultSet.getString("firstName"));
+            }
+        }
     }
 
+    /**
+     * Test to delete a contact from the database
+     * @throws Exception
+     */
     @Test
     public void deleteContactTest() throws Exception {
-        doNothing().when(mockPreparedStatement).executeUpdate();
         testContactService.deleteContact(1);
 
-        verify(mockPreparedStatement, times(1)).executeUpdate();
-        assertNull(testContactService.getContact(1));
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
+            statement.setInt(1, 1);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                assertFalse(resultSet.next());
+            }
+        }
     }
 
+    /**
+     * Test for deleting a contact that does not exist
+     * @throws Exception
+     */
     @Test
     public void deleteNonExistentContact() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            testContactService.deleteContact(80088);
+        assertThrows(SQLException.class, () -> {
+            testContactService.deleteContact(80000);
         });
     }
 
     @Test
     public void updateFirstNameTest() throws Exception {
-        doNothing().when(mockPreparedStatement).executeUpdate();
         testContactService.updateContact(new Contact(1, "Test", "Mcgee", "1234567899", "Long Address"));
 
-        verify(mockPreparedStatement, times(1)).executeUpdate();
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
+            statement.setInt(1, 1);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                assertTrue(resultSet.next());
+                assertEquals("Test", resultSet.getString("firstname"));
+            }
+        }
     }
 
     @Test
     public void updateLastNameTest() throws Exception {
-        doNothing().when(mockPreparedStatement).executeUpdate();
         testContactService.updateContact(new Contact(1, "Jim", "Success", "1234567890", "123 2nd Street, Jamaica State, 45555, United States"));
 
-        verify(mockPreparedStatement, times(1)).executeUpdate();
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
+            statement.setInt(1, 1);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                assertTrue(resultSet.next());
+                assertEquals("Success", resultSet.getString("lastname"));
+            }
+        }
     }
 
     @Test
     public void updateAddressTest() throws Exception {
-        doNothing().when(mockPreparedStatement).executeUpdate();
         testContactService.updateContact(new Contact(1, "Jim", "Beam", "1234567890", "Success"));
 
-        verify(mockPreparedStatement, times(1)).executeUpdate();
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
+            statement.setInt(1, 1);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                assertTrue(resultSet.next());
+                assertEquals("Success", resultSet.getString("address"));
+            }
+        }
     }
 
     @Test
     public void updatePhoneNumberTest() throws Exception {
-        doNothing().when(mockPreparedStatement).executeUpdate();
         testContactService.updateContact(new Contact(1, "Jim", "Beam", "1111111111", "123 2nd Street, Jamaica State, 45555, United States"));
 
-        verify(mockPreparedStatement, times(1)).executeUpdate();
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
+            statement.setInt(1, 1);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                assertTrue(resultSet.next());
+                assertEquals("1111111111", resultSet.getString("phone"));
+            }
+        }
     }
 }

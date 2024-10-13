@@ -4,8 +4,6 @@
  *
  * @author Samuel Walters
  *  Last update 10/6/2024
- *
- *  This class is used to interact with the database and perform CRUD operations on the contacts table.
  */
 
 package org.example.models;
@@ -18,16 +16,22 @@ import java.sql.*;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * 10/6/2024
+ * This class is used to interact with the database and perform CRUD operations on the contacts table.
+ */
 public class ContactService {
-    private DBConnection c = new DBConnection();
-
-    public Map<String, Contact> contactMap;
+    private DBConnection c;
 
     public ContactService() {
-        contactMap = new HashMap<>();
+        this.c = new DBConnection();
     }
 
-    /*
+    public ContactService(DBConnection dbConnection) {
+        this.c = dbConnection;
+    }
+
+    /**
     @param contact
     Takes in a contact object and adds it to the database.
      */
@@ -57,23 +61,25 @@ public class ContactService {
         }
     }
 
-    /*
-    @param contactId
-    Takes in an integer contactId and deletes the contact from the database.
+
+    /**
+     * Takes in an integer contactId and deletes the contact from the database.
+     * @param contactId the ID of the contact to delete
+     * @throws SQLException if a database access error occurs
      */
-    public void deleteContact(Integer contactId) {
+    public void deleteContact(Integer contactId) throws SQLException {
         String sql = "DELETE FROM contacts WHERE contactId = ?";
-        try {
-            c.getDBConnection();
-            PreparedStatement pstmt = c.getCon().prepareStatement(sql);
+        try (Connection connection = c.getDBConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, contactId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("No contact found with id: " + contactId);
+            }
         }
     }
 
-    /*
+    /**
     @param contact
     Takes in a contact object and deletes it from the database.
      */
@@ -89,9 +95,9 @@ public class ContactService {
         }
     }
 
-    /*
-    @return contact
-    Takes in an integer contactId and returns the contact object from the database.
+    /**
+     * @return contact
+     * Takes in an integer contactId and returns the contact object from the database.
      */
     public Contact getContact(Integer contactId) {
         if (contactId == null) {
@@ -113,7 +119,7 @@ public class ContactService {
         }
         return contact;
     }
-/*
+/**
     @param contact
     Takes in a contact object and updates the contact in the database.
  */
@@ -132,8 +138,11 @@ public class ContactService {
             throw new RuntimeException("Error updating contact", e);
         }
     }
-    /* 9/26 added to support observable list from JavaFX controller.
-        Get the list of contacts from the database and return it as an observable list.
+
+    /**
+     * @return contactList
+     * 9/26 added to support observable list from JavaFX controller.
+    *  10/6/2024 Get the list of contacts from the database and return it as an observable list.
     */
     public ObservableList<Contact> getContactsList() {
         ObservableList<Contact> contactList = FXCollections.observableArrayList();
