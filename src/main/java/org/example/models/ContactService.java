@@ -3,98 +3,163 @@
  * Contact Service class
  *
  * @author Samuel Walters
- *
- *  Last update 9/26/24
+ *  Last update 10/6/2024
  */
 
 package org.example.models;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.example.data.DBConnection;
 
+import java.sql.*;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * 10/6/2024
+ * This class is used to interact with the database and perform CRUD operations on the contacts table.
+ */
 public class ContactService {
-    public Map<String, Contact> contactMap;
+    private DBConnection c;
 
     public ContactService() {
-        contactMap = new HashMap<>();
+        this.c = new DBConnection();
     }
 
-    // TODO: Can remove when DB implemented and use phoneNumber as PK.
-//  9/26 Created the generateId method to generate a unique ID for each contact.
-    public String generateId() {
-        return Integer.toString(contactMap.size() + 1);
+    public ContactService(DBConnection dbConnection) {
+        this.c = dbConnection;
     }
 
+    /**
+    @param contact
+    Takes in a contact object and adds it to the database.
+     */
     public void addContact(Contact contact) {
         if (contact == null) {
             throw new IllegalArgumentException("Contact cannot be empty");
         }
-        String contactId = contact.getId();
-        if (contactMap.containsKey(contactId)) {
-            throw new IllegalArgumentException("Contact ID: " + contactId + "already exists.");
+        try {
+            c.getDBConnection();
+            String sql = "INSERT INTO contacts (firstName, lastName, phone, address) VALUES (?, ?, ?, ?)";
+            PreparedStatement ps = c.getCon().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, contact.getFirstName());
+            ps.setString(2, contact.getLastName());
+            ps.setString(3, contact.getPhone());
+            ps.setString(4, contact.getAddress());
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                contact.setId(rs.getInt(1));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error adding contact to the database", e);
         }
-        contactMap.put(contactId, contact);
     }
 
-    public void deleteContact(String contactId) {
+
+    /**
+     * Takes in an integer contactId and deletes the contact from the database.
+     * @param contactId the ID of the contact to delete
+     * @throws SQLException if a database access error occurs
+     */
+    public void deleteContact(Integer contactId) throws SQLException {
+        String sql = "DELETE FROM contacts WHERE contactId = ?";
+        try (Connection connection = c.getDBConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, contactId);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("No contact found with id: " + contactId);
+            }
+        }
+    }
+
+    /**
+    @param contact
+    Takes in a contact object and deletes it from the database.
+     */
+    public void deleteContact(Contact contact) {
+        String sql = "DELETE FROM contacts WHERE contactId = ?";
+        try {
+            c.getDBConnection();
+            PreparedStatement pstmt = c.getCon().prepareStatement(sql);
+            pstmt.setInt(1, contact.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @return contact
+     * Takes in an integer contactId and returns the contact object from the database.
+     */
+    public Contact getContact(Integer contactId) {
         if (contactId == null) {
-            throw new IllegalArgumentException("ContactId cannot be empty");
-        }
-        if (!contactMap.containsKey(contactId)) {
-            throw new IllegalArgumentException("The contactId was not found");
-        }
-        contactMap.remove(contactId);
-    }
-
-    public Contact getContact(String contactId) {
-        if (contactId == null || contactId.isEmpty()) {
             throw new IllegalArgumentException("ContactId cannot be empty or null.");
         }
-        return contactMap.get(contactId);
+        String sql = "SELECT * FROM contacts WHERE contactId = ?";
+        Contact contact = null;
+        try {
+            c.getDBConnection();
+            PreparedStatement pstmt = c.getCon().prepareStatement(sql);
+            pstmt.setInt(1, contactId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                contact = new Contact(rs.getInt("contactId"), rs.getString("firstName"), rs.getString("lastName"), rs.getString("phone"), rs.getString("address"));
+                return contact;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return contact;
+    }
+/**
+    @param contact
+    Takes in a contact object and updates the contact in the database.
+ */
+    public void updateContact(Contact contact) {
+        String sql = "UPDATE contacts SET firstName = ?, lastName = ?, phone = ?, address = ? WHERE contactId = ?";
+        try (Connection conn = c.getDBConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, contact.getFirstName());
+            ps.setString(2, contact.getLastName());
+            ps.setString(3, contact.getPhone());
+            ps.setString(4, contact.getAddress());
+            ps.setInt(5, contact.getId());
+            System.out.println(ps);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating contact", e);
+        }
     }
 
-    public void updateContactMap(String contactId, String updateField, String updateValue) {
-        if (contactId == null || contactId.isEmpty()) {
-            throw new IllegalArgumentException("Must have non empty non null contact ID.");
-        }
-        if (!contactMap.containsKey(contactId)) {
-            throw new IllegalArgumentException("The contactId was not found");
-        }
-        Contact contact = contactMap.get(contactId);
-
-        switch(updateField.toLowerCase()) {
-            case "firstname" :
-                contact.setFirstName(updateValue);
-                    break;
-            case "lastname" :
-                contact.setLastName(updateValue);
-                break;
-            case ("phone"):
-                contact.setPhone(updateValue);
-                break;
-            case "address" :
-                contact.setAddress(updateValue);
-                break;
-            default:
-                throw new IllegalArgumentException("Updatable field names are: firstname, lastname, phone, and address.");
-        }
-    }
-
-/* 9/26 added to support observable list from JavaFX controller.
-    Retrieve contacts from the hashmap implementation. This will get replaced with the DB.
-    @return ObservableList<Contact>
-*/
+    /**
+     * @return contactList
+     * 9/26 added to support observable list from JavaFX controller.
+    *  10/6/2024 Get the list of contacts from the database and return it as an observable list.
+    */
     public ObservableList<Contact> getContactsList() {
         ObservableList<Contact> contactList = FXCollections.observableArrayList();
-        try{
-            for (Map.Entry<String, Contact> entry : contactMap.entrySet()) {
-                contactList.add(entry.getValue());
+        try {
+            String query = "SELECT contactId, firstName, lastName, phone, address FROM contacts";
+            c.getDBConnection();
+            Statement st = c.getCon().createStatement();
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()) {
+                Contact contact = new Contact(rs.getInt("contactId"), rs.getString("firstName"), rs.getString("lastName"), rs.getString("phone"), rs.getString("address"));
+                contactList.add(contact);
             }
-        }catch(Exception e) {
-            e.printStackTrace();
+            st.close();
+            rs.close();
+            c.closeConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return contactList;
     }

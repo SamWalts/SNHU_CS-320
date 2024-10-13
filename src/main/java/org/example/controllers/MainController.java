@@ -1,7 +1,8 @@
-/*
+/**
 Artifact Enhancement
 Author: Samuel Walters
 Date: 9/26/24
+Updated: 10/4/24 to include the database connection and implement new buttons to update, and delete contacts.
  */
 package org.example.controllers;
 
@@ -15,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import org.example.models.Contact;
 import org.example.models.ContactService;
 
@@ -52,14 +54,15 @@ public class MainController implements Initializable {
     private Button createBtn;
 
     @FXML
+    private Button updateBtn;
+
+    @FXML
+    private Button deleteBtn;
+
+    @FXML
     private Label labelMessage;
 
-//  TODO: Make CSS file for the list. Lower priority.
-//  TODO: Make a new screen, for when the contact is selected for updates. Maybe have a new button, and it will take the highlighted option.
-//  TODO: Make a button for deletion with asking if user is sure?
-
-
-//   Make new contactService in order to have it handle the contactsList. Will be changed with implementation of Database.
+//   Call the ContactService class once to get the contacts list and use it throughout the program.
     ContactService contactService = new ContactService();
 
 //    private ObservableList<Contact> contactsList;
@@ -71,71 +74,132 @@ public class MainController implements Initializable {
     }
 
     /*
-    * called on initialize. As of 9/19/24 the getContactsList() method only pulls from an empty hashmap. On update of the map
-    * it should show more.
-    *
-    * * */
+    * Method to show the contacts in the table view.
+    * */
     @FXML
     private void showContacts() {
         ObservableList<Contact> contactsList = contactService.getContactsList();
         colFirstName.setCellValueFactory(new PropertyValueFactory<Contact, String>("firstName"));
-        colLastName.setCellValueFactory(new PropertyValueFactory<Contact, String>("LastName"));
+        colLastName.setCellValueFactory(new PropertyValueFactory<Contact, String>("lastName"));
         colPhoneNumber.setCellValueFactory(new PropertyValueFactory<Contact, String>("phone"));
         colAddress.setCellValueFactory(new PropertyValueFactory<Contact, String>("address"));
         tableView.setItems(contactsList);
     }
 
+    /**
+    @param e
+    Updated 10/4/2024 takes in an action event and determines which button was clicked, then calls the appropriate method.
+    All must end with a new call to showContacts() to update the table view.
+     */
     @FXML
-    private void handleCreateButtonClick(ActionEvent e) {
-        if(nameFirst.getText().isEmpty() || nameLast.getText().isEmpty() || phoneField.getText().isEmpty() || addressField.getText().isEmpty()) {
-            labelMessage.setText("Please fill out all fields.");
-        } else {
-            createContact();
-            showContacts();
-//            labelMessage.setText("Contact created successfully.");
+    private void handleButtonClick(ActionEvent e) {
+        System.out.println(((Button) e.getSource()).getId());
+        switch(((Button) e.getSource()).getId()) {
+            case "deleteBtn":
+                deleteContact();
+                showContacts();
+                break;
+            case "createBtn":
+                createContact();
+                showContacts();
+                break;
+            case "updateBtn":
+                updateContact();
+                showContacts();
+                break;
+            default:
+                labelMessage.setText("Invalid button");
         }
     }
 
-/*
-* On CreateButton click, create contact, and insert into the contactService.
-* Currently getting ID in controller. Will be removed when DB is created.
-* TODO: Remove ID from controller and have it generated in the ContactService DB implemented.
-* */
+    /**
+    * Method to create a contact. It will take the information from the text fields and create a new contact.
+    * 10/4/2024 updated to use try/catch block to catch IllegalArgumentExceptions thrown by the Contact object.
+     */
     @FXML
     private void createContact() {
-        try {
+        if (nameFirst.getText().isEmpty() || nameLast.getText().isEmpty() || phoneField.getText().isEmpty() || addressField.getText().isEmpty()) {
+            labelMessage.setText("Please fill out all fields.");
+        } else {
+            try {
 //          Reset label message text.
+                labelMessage.setText("");
+                Contact contact = new Contact(nameLast.getText(), nameFirst.getText(), phoneField.getText(), addressField.getText());
+                contactService.addContact(contact);
+                clearFields();
+            } catch (IllegalArgumentException e) {
+                labelMessage.setText(e.getMessage());
+            }
+        }
+    }
+
+    /**
+    * Method to delete a contact. It will take the selected contact from the table view and delete it.
+    * 10/4/2024
+     */
+    @FXML
+    private void deleteContact() {
+        try {
             labelMessage.setText("");
-            // Remove the below with implementation of a DB
-            String Id = contactService.generateId();
-            Contact contact = new Contact(Id, nameLast.getText(), nameFirst.getText(), phoneField.getText(), addressField.getText());
-            contactService.addContact(contact);
+            Contact contact = tableView.getSelectionModel().getSelectedItem();
+            contactService.deleteContact(contact);
+            showContacts();
             clearFields();
         } catch (IllegalArgumentException e) {
             labelMessage.setText(e.getMessage());
         }
-
     }
 
-//    // Method to show a success message
-//    private void showSuccessMessage() {
-//        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//        alert.setTitle("Success");
-//        alert.setHeaderText(null);
-//        alert.setContentText("Contact created successfully!");
-//        alert.showAndWait();
-//    }
-//
-//    // Method to show an error message
-//    private void showErrorMessage(String message) {
-//        Alert alert = new Alert(Alert.AlertType.ERROR);
-//        alert.setTitle("Error");
-//        alert.setHeaderText(null);
-//        alert.setContentText(message);
-//        alert.showAndWait();
-//    }
+    /**
+    * Method to handle a mouse click event. It will take the selected contact from the table view and populate the text fields.
+    * 10/4/2024
+     */
+    @FXML
+    public void mouseClicked(MouseEvent mouseEvent) {
+        try {
+            labelMessage.setText("");
+            Contact contact = tableView.getSelectionModel().getSelectedItem();
+            nameFirst.setText(contact.getFirstName());
+            nameLast.setText(contact.getLastName());
+            phoneField.setText(contact.getPhone());
+            addressField.setText(contact.getAddress());
+            deleteBtn.setDisable(false);
+            updateBtn.setDisable(false);
+         } catch (IllegalArgumentException ex) {
+            labelMessage.setText(ex.getMessage());
+        }
+    }
 
-    // Method to clear all fields
+    /**
+    * Method to update a contact. It will take the selected contact from the table view and update it.
+    * Updated 10/4/2024
+    */
+    @FXML
+    private void updateContact() {
+        try {
+            labelMessage.setText("");
+            Contact contact = tableView.getSelectionModel().getSelectedItem();
+            if (contact != null) {
+                contact.setFirstName(nameFirst.getText());
+                contact.setLastName(nameLast.getText());
+                contact.setPhone(phoneField.getText());
+                contact.setAddress(addressField.getText());
+                contactService.updateContact(contact);
+                clearFields();
+                showContacts();
+            } else {
+                labelMessage.setText("No contact selected.");
+            }
+        } catch (IllegalArgumentException e) {
+            labelMessage.setText(e.getMessage());
+        }
+    }
+
+    /**
+     * 9/26/2024
+    * Method to clear the fields after a contact is created.
+    * Called after every successful contact creation.
+     */
     private void clearFields() {
         nameFirst.clear();
         nameLast.clear();

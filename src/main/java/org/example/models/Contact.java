@@ -5,22 +5,28 @@
  * @author Samuel Walters
  *
  * Last update 9/26/24
+ * This class is used to create a contact object.
  */
 package org.example.models;
 
 public class Contact {
-    final private String Id;
+    private int Id;
     private String firstName;
     private String lastName;
     private String phone;
     private String address;
 
-//    9/26 Updated the contact ID increasing the ID length.
-    public Contact(String Id, String firstName, String lastName, String phone, String address) {
-        if (Id == null || Id.length() > 20) {
-            throw new IllegalArgumentException("Invalid ID");
-        }
 
+//    10/2 Created new constructor to allow for the object to be created without an ID.
+//    When the object is then queried to populate a table, it will return the ID in the below constructor.
+    public Contact(String firstName, String lastName, String phone, String address) {
+        this.setFirstName(firstName);
+        this.setLastName(lastName);
+        this.setPhone(phone);
+        this.setAddress(address);
+    }
+//    10/2 Created new constructor to allow for an ID to be passed in.
+    public Contact(int Id, String firstName, String lastName, String phone, String address) {
         this.Id = Id;
         this.setFirstName(firstName);
         this.setLastName(lastName);
@@ -28,7 +34,7 @@ public class Contact {
         this.setAddress(address);
     }
 
-//    9/26 Updated the firstName increasing the allowed length.
+    //    9/26 Updated the firstName increasing the allowed length.
     public void setFirstName(String firstName) {
         if (firstName == null || firstName.length() > 20 || firstName.isEmpty()) {
             throw new IllegalArgumentException("Invalid first name");
@@ -36,7 +42,7 @@ public class Contact {
         this.firstName = firstName;
     }
 
-/*
+/**
 * 9/26 Updated the phone number to allow for more than 10 digits.
 * Added a regex to remove any non-digit characters from the phone number.
 * */
@@ -59,8 +65,9 @@ public class Contact {
         }
     }
 
+// 10/4 Updated the address to allow for 75 characters.
     public void setAddress(String address) {
-        if (address == null || address.length() > 30 || address.isEmpty()) {
+        if (address == null || address.length() > 75 || address.isEmpty()) {
             throw new IllegalArgumentException("Invalid address");
         }
         this.address = address;
@@ -74,7 +81,7 @@ public class Contact {
         this.lastName = lastName;
     }
 
-    public String getId() {
+    public int getId() {
         return Id;
     }
 
@@ -92,5 +99,9 @@ public class Contact {
 
     public String getAddress() {
         return address;
+    }
+
+    public void setId(int contactId) {
+        this.Id = contactId;
     }
 }
