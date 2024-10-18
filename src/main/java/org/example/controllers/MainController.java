@@ -3,7 +3,7 @@ Artifact Enhancement
 Author: Samuel Walters
 Date: 9/26/24
 Updated: 10/4/24 to include the database connection and implement new buttons to update, and delete contacts.
-Issues: The program can be improved by adding a confirmation dialog before deleting a contact.
+Description: This class is the main controller for the JavaFX application. It handles the user input and updates the view based on the user's actions.
  */
 package org.example.controllers;
 

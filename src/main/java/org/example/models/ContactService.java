@@ -3,8 +3,10 @@
  * Contact Service class
  *
  * @author Samuel Walters
- *  Last update 10/13/2024 To remove all hashmaps and update the class to use a database connection.
- *
+ *  Update 10/13/2024 To remove all hashmaps and update the class to use a database connection.
+ *  Update 10/18/2024 Changed the addContact method to use Integers.
+ * Description: This class is used to interact with the database and perform CRUD operations on the contacts table.
+ * Will return an observable list of contacts to be used in the JavaFX controller.
  */
 
 package org.example.models;
@@ -43,33 +45,49 @@ public class ContactService {
      */
     public void addContact(Contact contact) {
         if (contact == null) {
-            throw new IllegalArgumentException("Contact cannot be empty");
+            throw new IllegalArgumentException("Contact cannot be null");
         }
-        try {
-            c.getDBConnection();
-            String sql = "INSERT INTO contacts (firstName, lastName, phone, address) VALUES (?, ?, ?, ?)";
-            PreparedStatement ps = c.getCon().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, contact.getFirstName());
-            ps.setString(2, contact.getLastName());
-            ps.setString(3, contact.getPhone());
-            ps.setString(4, contact.getAddress());
-            ps.executeUpdate();
 
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                contact.setId(rs.getInt(1));
+        Integer contactId = contact.getId();
+        if (contactId != null && contactId > 0) {
+            // Update existing contact
+            String sql = "INSERT INTO contacts (contactId, firstName, lastName, phone, address) VALUES (?, ?, ?, ?, ?)";
+            try (Connection conn = c.getDBConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, contactId);
+                ps.setString(2, contact.getFirstName());
+                ps.setString(3, contact.getLastName());
+                ps.setString(4, contact.getPhone());
+                ps.setString(5, contact.getAddress());
+
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Error updating contact", e);
             }
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error adding contact to the database", e);
+        } else {
+            // Insert new contact
+            String sql = "INSERT INTO contacts (firstName, lastName, phone, address) VALUES (?, ?, ?, ?)";
+            try (Connection conn = c.getDBConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, contact.getFirstName());
+                ps.setString(2, contact.getLastName());
+                ps.setString(3, contact.getPhone());
+                ps.setString(4, contact.getAddress());
+                ps.executeUpdate();
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        contact.setId(rs.getInt(1));
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error adding contact to the database", e);
+            }
         }
     }
 
-
     /**
-     * Takes in an integer contactId and deletes the contact from the database.
+     * Takes in an int contactId and deletes the contact from the database.
      * @param contactId the ID of the contact to delete
      * @throws SQLException if a database access error occurs
      */
@@ -90,12 +108,20 @@ public class ContactService {
     Takes in a contact object and deletes it from the database.
      */
     public void deleteContact(Contact contact) {
+        if (contact == null) {
+            throw new IllegalArgumentException("Contact cannot be empty");
+        }
+        Integer contactId = contact.getId();
         String sql = "DELETE FROM contacts WHERE contactId = ?";
         try {
             c.getDBConnection();
             PreparedStatement pstmt = c.getCon().prepareStatement(sql);
             pstmt.setInt(1, contact.getId());
             pstmt.executeUpdate();
+            Integer rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("No contact found with id: " + contactId);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -104,30 +130,26 @@ public class ContactService {
     /**
      * @param contactId
      * @return contact
-     * Takes in an integer contactId and returns the contact object from the database.
+     * Takes in an int contactId and returns the contact object from the database.
      */
-    public Contact getContact(Integer contactId) {
-        if (contactId == null) {
-            throw new IllegalArgumentException("ContactId cannot be empty or null.");
-        }
+    public Contact getContact(Integer contactId) throws SQLException {
         String sql = "SELECT * FROM contacts WHERE contactId = ?";
         Contact contact = null;
-        try {
-            c.getDBConnection();
-            PreparedStatement pstmt = c.getCon().prepareStatement(sql);
+        try (Connection connection = c.getDBConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, contactId);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                contact = new Contact(rs.getInt("contactId"), rs.getString("firstName"), rs.getString("lastName"), rs.getString("phone"), rs.getString("address"));
-                return contact;
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    contact = new Contact(rs.getInt("contactId"), rs.getString("firstName"), rs.getString("lastName"), rs.getString("phone"), rs.getString("address"));
+                } else {
+                    throw new SQLException("No contact found with id: " + contactId);
+                }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return contact;
     }
 
-/**
+    /**
     @param contact
     Takes in a contact object and updates the contact in the database.
  */
@@ -147,7 +169,7 @@ public class ContactService {
         }
     }
 
-    /*
+    /**
      * @return contactList
      * 9/26 added to support observable list from JavaFX controller.
     *  10/6/2024 Get the list of contacts from the database and return it as an observable list.

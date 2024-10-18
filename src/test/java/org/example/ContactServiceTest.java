@@ -2,12 +2,13 @@
  * Original Artifact-- ENHANCEMENT
  * Contact Service testing class
  * Author: Samuel Walters
- * Last update 10/13/2024
+ * Last update 10/18/2024
  * Each test is designed to test a different method in the ContactService class.
  * The tests are designed to test the CRUD operations of the ContactService class.
  */
 package org.example;
 
+import javafx.collections.ObservableList;
 import org.example.data.DBConnection;
 import org.example.models.Contact;
 import org.example.models.ContactService;
@@ -58,36 +59,88 @@ public class ContactServiceTest {
             statement.execute();
         }
 
-        Contact testContact = new Contact("Jim", "Beam", "123-456-7890", "123 2nd Street, Jamaica State, 45555, United States");
+        Contact testContact = new Contact("Jim", "Brom", "123-456-7890", "123 2nd Street, Jamaica State, 45555, United States");
         testContactService.addContact(testContact);
     }
 
     /**
+     * 10/16/2024
      * Test to add a contact to the database
      * Adds with contactService, then checks test database for the added contact
      * @throws Exception
      */
     @Test
     public void addContactTest() throws Exception {
-        Contact newContact = new Contact(2, "John", "Lolligag", "1234567890", "Address stuff");
+        Contact newContact = new Contact(10, "John", "Lolligag", "1234567890", "Address stuff");
         testContactService.addContact(newContact);
 
         try (Connection connection = dbConnection.getDBConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
-            statement.setInt(1, 2);
+            statement.setInt(1, 10);
             try (ResultSet resultSet = statement.executeQuery()) {
                 assertTrue(resultSet.next());
                 assertEquals("John", resultSet.getString("firstName"));
             }
         }
+        // Test for adding null contact
+        assertThrows(IllegalArgumentException.class, () -> {
+            testContactService.addContact(null);
+        });
     }
 
     /**
+     * 10/16/2024
+     * Test to get a list of contacts from the database
+     * Adds contacts to the database, then retrieves the list of contacts
+     * @throws Exception
+     */
+    @Test
+    public void getContactsListTest() throws Exception {
+        // Add some contacts to the database
+        Contact contact1 = new Contact("John", "Doe", "1234567890", "123 Main St");
+        Contact contact2 = new Contact("Jane", "Smith", "0987654321", "456 Elm St");
+        testContactService.addContact(contact1);
+        testContactService.addContact(contact2);
+
+        // Retrieve the list of contacts. Uses javaFX ObservableList.
+        ObservableList<Contact> contactsList = testContactService.getContactsList();
+
+        // Verify the list size returned
+        assertEquals(3, contactsList.size());
+
+        // Verify the details of the First added contact
+        Contact retrievedContact1 = contactsList.get(1);
+        assertEquals("John", retrievedContact1.getFirstName());
+        assertEquals("Doe", retrievedContact1.getLastName());
+        assertEquals("1234567890", retrievedContact1.getPhone());
+        assertEquals("123 Main St", retrievedContact1.getAddress());
+
+        // Verify the details of the second added contact
+        Contact retrievedContact2 = contactsList.get(2);
+        assertEquals("Jane", retrievedContact2.getFirstName());
+        assertEquals("Smith", retrievedContact2.getLastName());
+        assertEquals("0987654321", retrievedContact2.getPhone());
+        assertEquals("456 Elm St", retrievedContact2.getAddress());
+    }
+
+    /**
+     * 10/16/2024
+     * Test to add a contact to the database with null values
+     */
+    @Test
+    public void addContactTestNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            testContactService.addContact(null);
+        });
+    }
+
+    /**
+     * 10/16/2024
      * Test to delete a contact from the database
      * @throws Exception
      */
     @Test
-    public void deleteContactTest() throws Exception {
+    public void deleteContactTestContactID() throws Exception {
         testContactService.deleteContact(1);
 
         try (Connection connection = dbConnection.getDBConnection();
@@ -100,16 +153,40 @@ public class ContactServiceTest {
     }
 
     /**
+     * 10/16/2024
+     * Test to delete a contact from the database using a contact object
+     * @throws Exception
+     */
+    @Test
+    public void deleteContactTestObject() throws Exception {
+        testContactService.deleteContact(new Contact(1, "Jim", "Doe", "123-456-7890", "123 2nd Street, Jamaica State, 45555, United States"));
+
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
+            statement.setInt(1, 1);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                assertFalse(resultSet.next());
+            }
+        }
+    }
+
+    /**
+     * 10/18/2024
      * Test for deleting a contact that does not exist
      * @throws Exception
      */
     @Test
     public void deleteNonExistentContact() {
         assertThrows(SQLException.class, () -> {
-            testContactService.deleteContact(80000);
+            testContactService.deleteContact(800000);
         });
     }
 
+    /**
+     * 10/16/2024
+     * Test to update the first name of a contact
+     * @throws Exception
+     */
     @Test
     public void updateFirstNameTest() throws Exception {
         testContactService.updateContact(new Contact(1, "Test", "Mcgee", "1234567899", "Long Address"));
@@ -125,6 +202,7 @@ public class ContactServiceTest {
     }
 
     /**
+     * 10/15/2024
      * Test to update the last name of a contact
      * @throws Exception
      */
@@ -143,13 +221,20 @@ public class ContactServiceTest {
     }
 
     /**
+     * 10/18/2024
      * Test to update the address of a contact
      * @throws Exception
      */
     @Test
     public void updateAddressTest() throws Exception {
-        testContactService.updateContact(new Contact(1, "Jim", "Beam", "1234567890", "Success"));
+//        Make a new contact object to update the address
+        Contact testContact = new Contact(1, "Jim", "Bromide", "1234567890", "Not Good");
+//        Call Contact to update the address
+        testContact.setAddress("Success");
+//        Call contactService to update the contact in DB
+        testContactService.updateContact(testContact);
 
+//        Check in the DB to see if the address was updated
         try (Connection connection = dbConnection.getDBConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
             statement.setInt(1, 1);
@@ -161,12 +246,13 @@ public class ContactServiceTest {
     }
 
     /**
+     * 10/18/2024
      * Test to update the phone number of a contact
      * @throws Exception
      */
     @Test
     public void updatePhoneNumberTest() throws Exception {
-        testContactService.updateContact(new Contact(1, "Jim", "Beam", "1111111111", "123 2nd Street, Jamaica State, 45555, United States"));
+        testContactService.updateContact(new Contact(1, "Jim", "Gaffergand", "1111111111", "123 2nd Street, Jamaica State, 45555, United States"));
 
         try (Connection connection = dbConnection.getDBConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM contacts WHERE contactId = ?")) {
@@ -176,5 +262,37 @@ public class ContactServiceTest {
                 assertEquals("1111111111", resultSet.getString("phone"));
             }
         }
+    }
+
+    /**
+     * 10/18/2024
+     * Test to update a contact. This test is to check if the contact is updated correctly.
+     * @throws SQLException
+     */
+    @Test
+    public void getContactTest() throws SQLException {
+        //Contact that I am inserting using the contactService.addContact method
+        testContactService.addContact(new Contact(5, "Sarah", "Doe", "1234567890", "123 2nd Street, Jamaica State, 45555, United States"));
+        Contact contact = testContactService.getContact(5);
+        assertNotNull(contact);
+        //Checking to see if the contact that I inserted is the same as the contact that I am retrieving
+        Contact retrievedContact = testContactService.getContact(5);
+
+        // Asserts for each field that should match what is retrieved. If they do not match, the test will fail.
+        assertEquals("Sarah", retrievedContact.getFirstName());
+        assertEquals("Doe", retrievedContact.getLastName());
+        assertEquals("1234567890", retrievedContact.getPhone());
+        assertEquals("123 2nd Street, Jamaica State, 45555, United States", retrievedContact.getAddress());
+    }
+
+    /**
+     * 10/18/2024
+     * Test to ensure that an exception is thrown when trying to get a contact that does not exist.
+     */
+    @Test
+    public void getFakeContact() {
+        assertThrows(SQLException.class, () -> {
+            testContactService.getContact(664465454);
+        });
     }
 }

@@ -4,13 +4,14 @@
  *
  * @author Samuel Walters
  *
- * Last update 9/26/24
+ * Last update 10/18/24 Changed Id from int to Integer to allow for null values.
  * This class is used to create a contact object.
+ * The contact will be created without Id and will be assigned by the database except for testing.
  */
 package org.example.models;
 
 public class Contact {
-    private int Id;
+    private Integer Id;
     private String firstName;
     private String lastName;
     private String phone;
@@ -27,7 +28,7 @@ public class Contact {
     }
 
 //    10/2 Created new constructor to allow for an ID to be passed in.
-    public Contact(int Id, String firstName, String lastName, String phone, String address) {
+    public Contact(Integer Id, String firstName, String lastName, String phone, String address) {
         this.Id = Id;
         this.setFirstName(firstName);
         this.setLastName(lastName);
@@ -82,7 +83,7 @@ public class Contact {
         this.lastName = lastName;
     }
 
-    public int getId() {
+    public Integer getId() {
         return Id;
     }
 
@@ -102,7 +103,7 @@ public class Contact {
         return address;
     }
 
-    public void setId(int contactId) {
+    public void setId(Integer contactId) {
         this.Id = contactId;
     }
 }

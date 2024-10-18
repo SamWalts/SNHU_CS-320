@@ -1,8 +1,10 @@
 /**
 Author: Samuel Walters
-Date: 2021-04-20
-Description: This is the CSS file for the JavaFX application. It is used to style the application.
+Date: 10/16/2024
+Description: This is the CSS file for the JavaFX application. It is used for styling the application.
 */
+
+/*Gets the image, and displays it. Increased the general Font size to be more readable.*/
 .root {
     -fx-font-family: 'JetBrains Mono';
     -fx-font-size: 20px;
@@ -20,27 +22,31 @@ Description: This is the CSS file for the JavaFX application. It is used to styl
     -fx-pref-width: 100px;
 }
 
-/* Created it's own bolder styling, as Delete cannot be undone.*/
+/* Created it's own bolder styling, as Delete cannot be undone it should be more dramatic.*/
 #deleteBtn {
     -fx-background-color: red;
     -fx-text-fill: white;
 }
 
+/* Created it's own bolder styling, as Delete cannot be undone it should be more dramatic.*/
 #deleteBtn:hover {
     -fx-background-color: yellow;
     -fx-text-fill: red;
 }
 
+/* Apply to all buttons.*/
 .button {
     -fx-background-color: lightblue;
     -fx-text-fill: grey;
 }
 
+/* Apply to all buttons.*/
 .button:hover {
     -fx-background-color: yellow;
     -fx-text-fill: red;
 }
 
+/*Styling for all text fields*/
 .text-field {
     -fx-border-color: blue;
     -fx-border-width: 2px;
@@ -49,12 +55,14 @@ Description: This is the CSS file for the JavaFX application. It is used to styl
     -fx-pref-column-count: 25;
 }
 
+/*Styling on the table columns*/
 .TableColumn {
     -fx-alignment: CENTER;
     -fx-background-color: lightblue;
     -fx-text-fill: grey;
 }
 
+/*Styling on the tableview itself*/
 .TableView {
     -fx-alignment: CENTER;
     -fx-background-color: lightblue;
